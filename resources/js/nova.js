@@ -1,8 +1,9 @@
 import Localization from '@/mixins/Localization'
 import { Form } from '@/util/FormValidation'
-import { setupAxios } from '@/util/axios'
-import { setupNumbro } from '@/util/numbro'
-import { setupInertia } from '@/util/inertia'
+import { setupAxios } from '@/bootstrap/axios'
+import { setupCodeMirror } from '@/bootstrap/codemirror'
+import { setupInertia } from '@/bootstrap/inertia'
+import { setupNumbro } from '@/bootstrap/numbro'
 import url from '@/util/url'
 import { createApp, h } from 'vue'
 import { hideProgress, revealProgress } from '@inertiajs/core'
@@ -12,6 +13,7 @@ import { registerFields } from './fields'
 import Mousetrap from 'mousetrap'
 import { createNovaStore } from './store'
 import resourceStore from './store/resources'
+import NProgress from 'nprogress'
 import FloatingVue from 'floating-vue'
 import camelCase from 'lodash/camelCase'
 import fromPairs from 'lodash/fromPairs'
@@ -25,6 +27,8 @@ import { Settings } from 'luxon'
 import { ColorTranslator } from 'colortranslator'
 
 const { parseColor } = require('tailwindcss/lib/util/color')
+
+setupCodeMirror()
 
 const emitter = new Emitter()
 
@@ -94,10 +98,7 @@ export default class Nova {
     })
 
     /** @public */
-    this.$progress = {
-      start: force => revealProgress(force),
-      done: () => hideProgress(),
-    }
+    this.$progress = NProgress
 
     /** @public */
     this.$router = router
@@ -201,11 +202,7 @@ export default class Nova {
 
     await createInertiaApp({
       title: title => (!title ? appName : `${title} - ${appName}`),
-      progress: {
-        delay: 250,
-        includeCSS: false,
-        showSpinner: false,
-      },
+      progress: false,
       resolve: name => {
         const page =
           this.pages[name] != null

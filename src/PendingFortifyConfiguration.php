@@ -41,6 +41,7 @@ use Laravel\Nova\Auth\Actions\TwoFactorChallengeViewResponse;
 use Laravel\Nova\Auth\Actions\TwoFactorLoginResponse;
 use Laravel\Nova\Auth\Actions\UpdateUserPassword;
 use Laravel\Nova\Auth\Actions\VerifyEmailViewResponse;
+use Laravel\Nova\Events\ServingNova;
 
 class PendingFortifyConfiguration
 {
@@ -320,12 +321,7 @@ class PendingFortifyConfiguration
     public function register(?bool $routes = null): void
     {
         if (is_null($routes)) {
-            $routes = collect([
-                \App\Providers\FortifyServiceProvider::class, // @phpstan-ignore class.notFound
-                \App\Providers\JetstreamServiceProvider::class, // @phpstan-ignore class.notFound
-            ])->map(fn ($provider) => app()->getProvider($provider))
-            ->filter()
-            ->isNotEmpty();
+            $routes = Util::isFortifyRoutesRegisteredForFrontend();
         }
 
         if ($routes === false) {
@@ -338,8 +334,11 @@ class PendingFortifyConfiguration
      */
     public function bootstrap(Application $app): void
     {
-        Nova::serving(function () use ($app) {
+        Nova::serving(function (ServingNova $event) {
             $this->sync();
+
+            /** @var \Illuminate\Contracts\Foundation\Application $app */
+            $app = $event->app;
 
             $app->scoped(StatefulGuard::class, fn () => Auth::guard(Util::userGuard()));
             $app->scoped(RedirectAsIntended::class, RedirectAsIntendedForNova::class);

@@ -64,7 +64,7 @@ class PendingRouteRegistration
     /**
      * Indicate if Nova is being used to handle e-mail verification.
      */
-    public bool $withEmailVerification = true;
+    public bool $withEmailVerification = false;
 
     /**
      * The authentications middlewares.

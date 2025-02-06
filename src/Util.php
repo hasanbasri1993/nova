@@ -5,9 +5,12 @@ namespace Laravel\Nova;
 use BackedEnum;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use RuntimeException;
 use Stringable;
 
 class Util
@@ -25,7 +28,7 @@ class Util
                 $domain = $request->getScheme().'://'.$domain;
             }
 
-            if (! in_array($port = $request->getPort(), [443, 80]) && ! Str::endsWith($domain, ":{$port}")) {
+            if (! in_array($port = $request->getPort(), [443, 80]) && ! str_ends_with($domain, ":{$port}")) {
                 $domain = $domain.':'.$port;
             }
 
@@ -74,10 +77,23 @@ class Util
         }
 
         if (is_array($value)) {
-            return count($value) === 2 && ! Arr::isAssoc($value) && method_exists(...$value);
+            return count($value) === 2 && array_is_list($value) && method_exists(...$value);
         }
 
         return ! is_string($value);
+    }
+
+    /**
+     * Determine if Fortify routes is registered for frontend routing.
+     */
+    public static function isFortifyRoutesRegisteredForFrontend(): bool
+    {
+        return Collection::make([
+            \App\Providers\FortifyServiceProvider::class, // @phpstan-ignore class.notFound
+            \App\Providers\JetstreamServiceProvider::class, // @phpstan-ignore class.notFound
+        ])->map(static fn ($provider) => app()->getProvider($provider))
+        ->filter()
+        ->isNotEmpty();
     }
 
     /**
@@ -231,5 +247,24 @@ class Util
         ];
 
         return array_keys($lineEndingCount, max($lineEndingCount))[0];
+    }
+
+    /**
+     * Expect given model to implements `Pivot` class or uses `AsPivot` trait.
+     *
+     * @param  (\Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\Relations\Concerns\AsPivot)|\Illuminate\Database\Eloquent\Relations\Pivot  $pivot
+     * @return (\Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\Relations\Concerns\AsPivot)|\Illuminate\Database\Eloquent\Relations\Pivot
+     *
+     * @throws \RuntimeException
+     */
+    public static function expectPivotModel(Model|Pivot $pivot): Model|Pivot
+    {
+        throw_unless(
+            isset(class_uses_recursive($pivot)[AsPivot::class]),
+            RuntimeException::class,
+            sprintf('%s model need to uses %s trait', $pivot::class, AsPivot::class),
+        );
+
+        return $pivot;
     }
 }

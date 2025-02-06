@@ -22,6 +22,7 @@
           :type="usernameInputType"
           :name="username"
           autofocus=""
+          autocomplete="username"
           required
         />
 
@@ -41,6 +42,7 @@
           id="password"
           type="password"
           name="password"
+          autocomplete="current-password"
           required
         />
 

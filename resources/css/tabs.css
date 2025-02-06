@@ -14,7 +14,11 @@
 }
 
 .tab-group .tab-item {
-  @apply relative min-w-min flex-shrink-0 flex-1 overflow-hidden bg-white dark:bg-gray-800 py-4 px-4 font-semibold text-center cursor-pointer hover:bg-gray-50 hover:dark:bg-gray-700 focus:z-10 first:rounded-tl-lg last:rounded-tr-lg;
+  @apply relative min-w-min flex-shrink-0 flex-1 overflow-hidden bg-white dark:bg-gray-800 py-4 px-4 font-semibold text-center;
+}
+
+.tab-group .tab-item:not(:disabled) {
+  @apply cursor-pointer hover:bg-gray-50 hover:dark:bg-gray-700 focus:z-10 first:rounded-tl-lg last:rounded-tr-lg;
 }
 
 .tab-group .tab.fields-tab {

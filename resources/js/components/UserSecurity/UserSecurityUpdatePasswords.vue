@@ -65,7 +65,7 @@
                 id="password"
                 name="password"
                 type="password"
-                autocomplete="current-password"
+                autocomplete="new-password"
                 class="form-control form-input form-control-bordered w-full"
                 :class="{
                   'form-control-bordered-error': form.errors.has('password'),
@@ -88,7 +88,7 @@
                 id="password_confirmation"
                 name="password_confirmation"
                 type="password"
-                autocomplete="current-password"
+                autocomplete="new-password"
                 class="form-control form-input form-control-bordered w-full"
                 :class="{
                   'form-control-bordered-error': form.errors.has(

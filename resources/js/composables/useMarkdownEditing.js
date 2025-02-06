@@ -275,6 +275,7 @@ const bootstrap = (
       Enter: 'newlineAndIndentContinueMarkdownList',
     },
     readOnly: props.readonly,
+    autoRefresh: true,
   })
 
   const doc = editor.getDoc()
